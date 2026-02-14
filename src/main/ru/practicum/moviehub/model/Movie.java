@@ -8,8 +8,8 @@ public class Movie {
     private final String title;
     private final Integer year;
 
-    public static final int MIN_YEAR = 1888;
-    public static final int MAX_YEAR = java.time.Year.now().getValue() + 1;
+   private static final int MIN_YEAR = 1888;
+   private static final int MAX_YEAR = java.time.Year.now().getValue() + 1;
 
     public Movie(String title, Integer year) {
         this.title = validateTitle(title);
@@ -31,6 +31,14 @@ public class Movie {
 
     public Integer getYear() {
         return year;
+    }
+
+    public static int getMinYear(){
+        return MIN_YEAR;
+    }
+
+    public static int getMaxYear(){
+        return MAX_YEAR;
     }
 
     // Валидация заголовка

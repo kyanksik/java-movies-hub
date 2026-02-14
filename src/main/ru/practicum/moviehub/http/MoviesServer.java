@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 
 public class MoviesServer {
     private final HttpServer server;
-    public MoviesStore moviesStore;
+    private final MoviesStore moviesStore;
 
     public MoviesServer(MoviesStore moviesStore, int port) {
         try {
@@ -30,4 +30,7 @@ public class MoviesServer {
         server.stop(0);
     }
 
+    public MoviesStore getMoviesStore() {
+        return moviesStore;
+    }
 }

@@ -100,8 +100,8 @@ public class MoviesApiTest {
     @Test
     void getMovies_returnsArrayMovies() throws Exception {
 
-        Movie title1 = server.moviesStore.create(new Movie("Title1", 1889));
-        Movie title2 = server.moviesStore.create(new Movie("Title2", 1890));
+        Movie title1 = server.getMoviesStore().create(new Movie("Title1", 1889));
+        Movie title2 = server.getMoviesStore().create(new Movie("Title2", 1890));
 
         HttpResponse<String> resp = responseTest(reqGET(baseUrl));
 
@@ -122,7 +122,7 @@ public class MoviesApiTest {
     @Test
     public void shouldReturnMovieById() throws Exception {
 
-        server.moviesStore.create(new Movie("Title1", 1889));
+        server.getMoviesStore().create(new Movie("Title1", 1889));
 
         HttpResponse<String> response = responseTest(reqGET(baseUrl + "/1"));
 
@@ -157,10 +157,10 @@ public class MoviesApiTest {
     @Test
     public void shouldReturnMoviesByYear() throws Exception {
 
-        Movie title1 = server.moviesStore.create(new Movie("Title1", 1889));
-        Movie title2 = server.moviesStore.create(new Movie("Title2", 1890));
-        Movie title3 = server.moviesStore.create(new Movie("Title3", 1890));
-        Movie title4 = server.moviesStore.create(new Movie("Title4", 1891));
+        Movie title1 = server.getMoviesStore().create(new Movie("Title1", 1889));
+        Movie title2 = server.getMoviesStore().create(new Movie("Title2", 1890));
+        Movie title3 = server.getMoviesStore().create(new Movie("Title3", 1890));
+        Movie title4 = server.getMoviesStore().create(new Movie("Title4", 1891));
 
         HttpResponse<String> response = responseTest(reqGET(baseUrl + "?year=1890"));
 
@@ -224,7 +224,7 @@ public class MoviesApiTest {
     @Test
     public void shouldReturn422WhenYearIsInvalid() throws Exception {
 
-        String errString = "год должен быть между " + Movie.MIN_YEAR + " и " + Movie.MAX_YEAR;
+        String errString = "год должен быть между " + Movie.getMinYear() + " и " + Movie.getMaxYear();
         String json = "{\"title\":\"Title1\",\"year\":1800}";
 
         HttpResponse<String> response = responseTest(reqPOST(baseUrl, json));
@@ -256,7 +256,7 @@ public class MoviesApiTest {
     @Test
     public void shouldDeleteMovieAndReturn204() throws Exception {
         // 1. Сначала добавляем фильм, чтобы было что удалять
-        server.moviesStore.create(new Movie("Title1", 1889));
+        server.getMoviesStore().create(new Movie("Title1", 1889));
 
         HttpResponse<String> response = responseTest(reqDELETE(baseUrl + "/1"));
 

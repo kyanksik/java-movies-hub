@@ -8,7 +8,11 @@ import java.io.OutputStream;
 
 public abstract class BaseHttpHandler implements HttpHandler {
 
-    int statusCode = 200;
+    private int statusCode = 200;
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {

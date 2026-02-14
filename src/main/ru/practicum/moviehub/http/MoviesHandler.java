@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesHandler extends BaseHttpHandler {
-    public MoviesStore moviesStore;
+    private final MoviesStore moviesStore;
 
     public MoviesHandler(MoviesStore moviesStore) {
         this.moviesStore = moviesStore;
@@ -35,14 +35,14 @@ public class MoviesHandler extends BaseHttpHandler {
                 var movieOptional = moviesStore.findById(id);
                 if (movieOptional.isPresent()) {
                     Movie movie = movieOptional.get();
-                    statusCode = 200;
+                    setStatusCode(200);
                     return JsonUtils.toJson(movie);
                 } else {
-                    statusCode = 404;
+                    setStatusCode(404);
                     return JsonUtils.toJson(ErrorResponse.notFound("Фильм не найден"));
                 }
             } catch (NumberFormatException e) {
-                statusCode = 400;
+                setStatusCode(400);
                 return JsonUtils.toJson(ErrorResponse.badRequest("Некорректный ID"));
             }
         }
@@ -59,16 +59,16 @@ public class MoviesHandler extends BaseHttpHandler {
                         .filter(m -> m.getYear() == year)
                         .toList();
 
-                statusCode = 200;
+                setStatusCode(200);
                 return JsonUtils.toJson(filteredMovies);
             } catch (Exception e) {
-                statusCode = 400;
+                setStatusCode(400);
                 return JsonUtils.toJson(ErrorResponse.badRequest("Некорректный параметр запроса — 'year'"));
             }
         }
 
         // 3. Обработка GET /movies (без параметров)
-        statusCode = 200;
+        setStatusCode(200);
         return JsonUtils.toJson(moviesStore.getAll());
     }
 
@@ -77,7 +77,7 @@ public class MoviesHandler extends BaseHttpHandler {
         // 1. Проверка Content-Type
         String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
         if (contentType == null || !contentType.contains("application/json")) {
-            statusCode = 415;
+            setStatusCode(415);
             return JsonUtils.toJson(ErrorResponse.unsupportedMediaType("Ожидается application/json"));
         }
 
@@ -87,7 +87,7 @@ public class MoviesHandler extends BaseHttpHandler {
         try {
             movieRequest = JsonUtils.fromJson(body, Movie.class);
         } catch (Exception e) {
-            statusCode = 400;
+            setStatusCode(400);
             return JsonUtils.toJson(ErrorResponse.badRequest("Некорректный JSON"));
         }
 
@@ -102,19 +102,19 @@ public class MoviesHandler extends BaseHttpHandler {
         }
 
         // Проверка year
-        if (movieRequest.getYear() < Movie.MIN_YEAR || movieRequest.getYear() > Movie.MAX_YEAR) {
-            errors.add("год должен быть между " + Movie.MIN_YEAR + " и " + Movie.MAX_YEAR);
+        if (movieRequest.getYear() < Movie.getMinYear() || movieRequest.getYear() > Movie.getMaxYear()) {
+            errors.add("год должен быть между " + Movie.getMinYear() + " и " + Movie.getMaxYear());
         }
 
         // 4. Обработка результата валидации
         if (!errors.isEmpty()) {
-            statusCode = 422; // Unprocessable Entity
+            setStatusCode(422); // Unprocessable Entity
             return JsonUtils.toJson(ErrorResponse.validationError(errors));
         }
 
         // 5. Сохранение и ответ
         Movie savedMovie = moviesStore.create(movieRequest); // Метод сохранения должен возвращать объект с ID
-        statusCode = 201;
+        setStatusCode(201);
         exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
         return JsonUtils.toJson(savedMovie);
     }
@@ -134,23 +134,23 @@ public class MoviesHandler extends BaseHttpHandler {
 
                 if (isRemoved) {
                     // Успешное удаление: статус 204 и пустое тело
-                    statusCode = 204;
+                    setStatusCode(204);
                     return "";
                 } else {
                     // Фильм с таким ID не найден
-                    statusCode = 404;
+                    setStatusCode(404);
                     exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
                     return JsonUtils.toJson(ErrorResponse.notFound("Фильм с id " + id + " не найден"));
                 }
             } catch (NumberFormatException e) {
-                statusCode = 400;
+               setStatusCode(400);
                 exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
                 return JsonUtils.toJson(ErrorResponse.badRequest("Некорректный формат id"));
             }
         }
 
         // Если ID не указан в пути (например, просто DELETE /movies)
-        statusCode = 400;
+        setStatusCode(400);
         exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
         return JsonUtils.toJson(ErrorResponse.badRequest("Не указан идентификатор фильма"));
     }
