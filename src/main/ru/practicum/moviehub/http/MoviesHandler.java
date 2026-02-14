@@ -143,7 +143,7 @@ public class MoviesHandler extends BaseHttpHandler {
                     return JsonUtils.toJson(ErrorResponse.notFound("Фильм с id " + id + " не найден"));
                 }
             } catch (NumberFormatException e) {
-               setStatusCode(400);
+                setStatusCode(400);
                 exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
                 return JsonUtils.toJson(ErrorResponse.badRequest("Некорректный формат id"));
             }
